@@ -55,6 +55,11 @@
   :group 'flymake-posframe
   :type 'string)
 
+(defcustom flymake-posframe-border-color "#fff"
+  "Border color of the child frame."
+  :group 'flymake-posframe
+  :type 'string)
+
 (defvar-local flymake-posframe-last-diag nil
   "Show the error at point.")
 
@@ -91,25 +96,27 @@ Only the `foreground' is used in this face."
           (setq flymake-posframe-last-diag diag)
           (posframe-show
            flymake-posframe-buffer
-	   :internal-border-width 3
-	   :left-fringe 1
-	   :right-fringe 1
-	   :foreground-color (face-foreground 'flymake-posframe-foreground-face nil t)
-	   :background-color (face-background 'flymake-posframe-background-face nil t)
+           :internal-border-width 3
+           :border-color flymake-posframe-border-color
+           :border-width 1
+           :left-fringe 1
+           :right-fringe 1
+           :foreground-color (face-foreground 'flymake-posframe-foreground-face nil t)
+           :background-color (face-background 'flymake-posframe-background-face nil t)
            :string (concat (propertize
-			    (pcase (flymake--diag-type diag)
-                                 (:error flymake-posframe-error-prefix)
-                                 (:warning flymake-posframe-warning-prefix)
-                                 (:note flymake-posframe-note-prefix))
-                               'face 'warning)
-			   (flymake--diag-text diag)))
+                            (pcase (flymake--diag-type diag)
+                              (:error flymake-posframe-error-prefix)
+                              (:warning flymake-posframe-warning-prefix)
+                              (:note flymake-posframe-note-prefix))
+                            'face 'warning)
+                           (flymake--diag-text diag)))
 
-	  (let ((current-posframe-frame
-		 (buffer-local-value 'posframe--frame (get-buffer flymake-posframe-buffer))))
-	    (redirect-frame-focus current-posframe-frame (frame-parent current-posframe-frame)))
+          (let ((current-posframe-frame
+                 (buffer-local-value 'posframe--frame (get-buffer flymake-posframe-buffer))))
+            (redirect-frame-focus current-posframe-frame (frame-parent current-posframe-frame)))
 
-	  (dolist (hook flymake-posframe-hide-posframe-hooks)
-	    (add-hook hook #'flymake-posframe-hide nil t)))
+          (dolist (hook flymake-posframe-hide-posframe-hooks)
+            (add-hook hook #'flymake-posframe-hide nil t)))
       (flymake-posframe-hide))))
 
 (define-minor-mode flymake-posframe-mode
